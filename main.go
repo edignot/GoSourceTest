@@ -6,9 +6,23 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
-
 	"github.com/gorilla/mux"
+	"gopkg.in/segmentio/analytics-go.v3"
 )
+
+// func main() {
+//   client := analytics.New("613hsjeYcPG9j8Xb3kJLqWUj6yQacPYT")
+//   defer client.Close()
+// }
+
+// client.Enqueue(analytics.Identify{
+//   UserId: "019mr8mf4r",
+//   Traits: analytics.NewTraits().
+//     SetName("Michael Bolton").
+//     SetEmail("mbolton@example.com").
+//     Set("plan", "Enterprise").
+//     Set("friends", 42),
+// })
 
 // Book struct (Model)
 type Book struct {
@@ -102,6 +116,25 @@ func main() {
 	r.HandleFunc("/books", createBook).Methods("POST")
 	r.HandleFunc("/books/{id}", updateBook).Methods("PUT")
 	r.HandleFunc("/books/{id}", deleteBook).Methods("DELETE")
+
+	client := analytics.New("613hsjeYcPG9j8Xb3kJLqWUj6yQacPYT")
+  defer client.Close()
+
+	client.Enqueue(analytics.Identify{
+  UserId: "019mr8mf4r",
+  Traits: analytics.NewTraits().
+    SetName("Michael Bolton").
+    SetEmail("mbolton@example.com").
+    Set("plan", "Enterprise").
+    Set("friends", 42),
+})
+
+client.Enqueue(analytics.Track{
+  Event:  "[T] Tested",
+  UserId: "f4ca124298",
+  Properties: analytics.NewProperties().
+    Set("plan", "Enterprise"),
+})
 
 	// Start server
 	log.Fatal(http.ListenAndServe(":8000", r))
